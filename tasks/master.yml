@@ -1,0 +1,7 @@
+---
+- name: Initialize the data dir
+  command: "{{ pgha_pg_ctl }} initdb -D {{ pgha_data_dir | quote }}"
+  args:
+    creates: "{{ pgha_data_dir }}/postgresql.conf"
+  become: true
+  become_user: postgres

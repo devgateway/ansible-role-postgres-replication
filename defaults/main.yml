@@ -1,0 +1,2 @@
+pgha_data_dir: /var/lib/pgsql/data
+pgha_pg_ctl: /usr/bin/pg_ctl
