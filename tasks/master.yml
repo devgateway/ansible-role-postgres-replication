@@ -5,3 +5,27 @@
     creates: "{{ pgha_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
+
+- name: Disable synchronous standby
+  ini_file:
+    path: "{{ pgha_data_dir }}/postgresql.conf"
+    section: null
+    option: synchronous_standby_names
+    state: absent
+
+- name: Apply replication settings
+  ini_file:
+    path: "{{ pgha_data_dir }}/postgresql.conf"
+    section: null
+    option: "{{ item.key }}"
+    value: |-
+      {%  if item.value is sameas true %}
+      {{    'on' }}
+      {%- elif item.value is sameas false %}
+      {{    'off' }}
+      {%- else %}
+      {{    item.value }}
+      {%- endif %}
+  with_dict: "{{ pghs_pg_settings }}"
+  loop_control:
+    label: "{{ item.key }}"

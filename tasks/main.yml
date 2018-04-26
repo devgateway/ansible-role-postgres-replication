@@ -7,6 +7,13 @@
   package:
     name: pcs
 
+- name: Create archive directory
+  file:
+    path: "{{ pgha_archive_dir }}"
+    state: directory
+    owner: postgres
+    mode: 0770
+
 - name: Configure master
   import_tasks: master.yml
   when: ansible_hostname == pgha_master
