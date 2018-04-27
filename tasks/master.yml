@@ -23,6 +23,8 @@
       {{    'on' }}
       {%- elif item.value is sameas false %}
       {{    'off' }}
+      {%- elif item.value is string %}
+      {{    item.value | quote }}
       {%- else %}
       {{    item.value }}
       {%- endif %}

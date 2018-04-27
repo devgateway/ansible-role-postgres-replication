@@ -2,11 +2,11 @@ pgha_data_dir: /var/lib/pgsql/data
 pgha_pg_ctl: /usr/bin/pg_ctl
 pgha_archive_dir: /var/lib/pgsql/archive
 pghs_pg_settings:
-  listen_addresses: "'*'"
+  listen_addresses: "*"
   wal_level: hot_standby
   synchronous_commit: true
   archive_mode: true
-  archive_command: "'cp %p {{ pgha_archive_dir }}/%f'"
+  archive_command: cp %p {{ pgha_archive_dir }}/%f
   max_wal_senders: 5
   wal_keep_segments: 32
   hot_standby: true
