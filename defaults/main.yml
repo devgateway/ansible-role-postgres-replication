@@ -16,3 +16,19 @@ pgha_pg_settings:
   max_standby_archive_delay: -1
   restart_after_crash: false
   hot_standby_feedback: true
+pgha_hba_defaults:
+  - type: local
+    user: all
+    database: all
+    address: null
+    method: trust
+  - type: host
+    user: all
+    database: all
+    address: 127.0.0.1/32
+    method: trust
+  - type: host
+    user: all
+    database: all
+    address: ::1/128
+    method: trust
