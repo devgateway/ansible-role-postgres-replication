@@ -28,6 +28,6 @@
       {%- else %}
       {{    item.value }}
       {%- endif %}
-  with_dict: "{{ pghs_pg_settings }}"
+  with_dict: "{{ pgha_pg_settings }}"
   loop_control:
     label: "{{ item.key }}"
