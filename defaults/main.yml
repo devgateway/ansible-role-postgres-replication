@@ -20,7 +20,6 @@ pgha_hba_defaults:
   - type: local
     user: all
     database: all
-    address: null
     method: trust
   - type: host
     user: all
