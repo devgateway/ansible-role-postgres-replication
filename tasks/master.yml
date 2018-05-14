@@ -31,3 +31,9 @@
   with_dict: "{{ pgha_pg_settings }}"
   loop_control:
     label: "{{ item.key }}"
+
+- name: Configure Postgres authentication
+  template:
+    src: pg_hba.conf.j2
+    dest: "{{ pgha_data_dir }}/pg_hba.conf"
+    owner: postgres

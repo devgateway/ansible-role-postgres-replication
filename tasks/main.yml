@@ -21,9 +21,3 @@
 - name: Configure slave
   import_tasks: slave.yml
   when: ansible_hostname == pgha_slave
-
-- name: Configure Postgres authentication
-  template:
-    src: pg_hba.conf.j2
-    dest: "{{ pgha_data_dir }}/pg_hba.conf"
-    owner: postgres
