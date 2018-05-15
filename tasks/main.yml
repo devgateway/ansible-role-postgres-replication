@@ -39,8 +39,11 @@
 
 - name: Configure master
   import_tasks: master.yml
-  when: ansible_hostname == pgha_master
+  delegate_to: "{{ pgha_master }}"
+  run_once: true
 
 - name: Configure slave
   import_tasks: slave.yml
   when: ansible_hostname == pgha_slave
+  delegate_to: "{{ pgha_slave }}"
+  run_once: true
