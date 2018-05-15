@@ -18,6 +18,15 @@ pgha_pg_settings:
   max_standby_archive_delay: -1
   restart_after_crash: false
   hot_standby_feedback: true
+pgha_recovery_settings:
+  standby_mode: true
+  primary_conninfo: >-
+    host={{ pgha_master }}
+    port=5432
+    user=replication
+    application_name={{ pgha_slave }}-slave
+  restore_command: cp {{ pgha_archive_dir }}/%f %p
+  recovery_target_timeline: latest
 pgha_hba_defaults:
   - type: local
     user: all

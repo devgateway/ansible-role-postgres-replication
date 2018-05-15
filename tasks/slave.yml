@@ -11,3 +11,25 @@
     creates: "{{ pgha_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
+
+- name: Create slave configuration
+  ini_file:
+    create: true
+    mode: 0660
+    owner: postgres
+    path: "{{ pgha_data_dir }}/recovery.conf"
+    section: null
+    option: "{{ item.key }}"
+    value: |-
+      {%  if item.value is sameas true %}
+      {{    'on' }}
+      {%- elif item.value is sameas false %}
+      {{    'off' }}
+      {%- elif item.value is string %}
+      {{    item.value | quote }}
+      {%- else %}
+      {{    item.value }}
+      {%- endif %}
+  with_dict: "{{ pgha_recovery_settings }}"
+  loop_control:
+    label: "{{ item.key }}"
