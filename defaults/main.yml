@@ -1,5 +1,6 @@
+---
 pgha_data_dir: /var/lib/pgsql/data
-pgha_pg_ctl: /usr/bin/pg_ctl
+pgha_bin_dir: /usr/bin
 pgha_archive_dir: /var/lib/pgsql/archive
 pgha_pg_settings:
   listen_addresses: "*"
