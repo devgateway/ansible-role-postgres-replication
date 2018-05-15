@@ -44,6 +44,5 @@
 
 - name: Configure slave
   import_tasks: slave.yml
-  when: ansible_hostname == pgha_slave
   delegate_to: "{{ pgha_slave }}"
   run_once: true
