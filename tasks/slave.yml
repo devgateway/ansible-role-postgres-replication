@@ -33,3 +33,8 @@
   with_dict: "{{ pgha_recovery_settings }}"
   loop_control:
     label: "{{ item.key }}"
+
+- name: Start slave node
+  service:
+    name: "{{ pgha_service }}"
+    state: started
