@@ -7,12 +7,35 @@
   package:
     name: pcs
 
+- name: Install Postgres management library for Python
+  package:
+    name: python-psycopg2
+
 - name: Create archive directory
   file:
     path: "{{ pgha_archive_dir }}"
     state: directory
     owner: postgres
     mode: 0770
+
+- name: Read Postgres uses configuration
+  user:
+    name: postgres
+  register: postgres_user
+  check_mode: true
+
+- name: Configure remote authentication
+  lineinfile:
+    create: true
+    mode: 0600
+    owner: postgres
+    path: "{{ postgres_user.home }}/.pgpass"
+    line: "{{ host }}:5432:{{ pgha_user.database }}:{{ pgha_user.user }}:{{ pgha_user.password }}"
+  loop:
+    - "{{ pgha_master }}"
+    - "{{ pgha_slave }}"
+  loop_control:
+    loop_var: host
 
 - name: Configure master
   import_tasks: master.yml

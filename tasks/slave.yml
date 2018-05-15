@@ -1,1 +1,13 @@
 ---
+- name: Create a base backup
+  command: >-
+    {{ pgha_bin_dir }}/pg_basebackup
+    --host={{ pgha_master }}
+    --user={{ pgha_user.user }}
+    --no-password
+    --pgdata={{ pgha_data_dir }}
+    --xlog-method=stream
+  args:
+    creates: "{{ pgha_data_dir }}/postgresql.conf"
+  become: true
+  become_user: postgres
