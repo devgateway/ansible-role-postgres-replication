@@ -31,7 +31,7 @@
     owner: postgres
     path: "{{ postgres_user.home }}/.pgpass"
     line: >-
-      {{ pgha_virtual_ip }}:*:{{ pgha_user.database }}:{{ pgha_user.user }}:{{ pgha_user.password }}
+      {{ pgha_virtual_ip }}:*:{{ pgha_user.database }}:{{ pgha_user.name }}:{{ pgha_user.password }}
 
 - name: Configure master
   import_tasks: master.yml

@@ -44,7 +44,7 @@
 
 - name: Create replication user
   postgresql_user:
-    name: "{{ pgha_user.user }}"
+    name: "{{ pgha_user.name }}"
     password: "{{ pgha_user.password }}"
     role_attr_flags: REPLICATION,LOGIN
   become_user: postgres

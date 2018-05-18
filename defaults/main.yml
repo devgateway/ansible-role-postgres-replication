@@ -23,22 +23,22 @@ pgha_recovery_settings:
   primary_conninfo: >-
     host={{ pgha_master }}
     port=5432
-    user=replication
+    user={{ pgha_user.name }}
     application_name={{ pgha_slave }}-slave
   restore_command: cp {{ pgha_archive_dir }}/%f %p
   recovery_target_timeline: latest
 pgha_hba_defaults:
   - type: local
-    user: all
+    name: all
     database: all
     method: trust
   - type: host
-    user: all
+    name: all
     database: all
     address: 127.0.0.1/32
     method: trust
   - type: host
-    user: all
+    name: all
     database: all
     address: ::1/128
     method: trust

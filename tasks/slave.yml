@@ -3,7 +3,7 @@
   command: >-
     {{ pgha_bin_dir }}/pg_basebackup
     --host={{ pgha_master }}
-    --user={{ pgha_user.user }}
+    --user={{ pgha_user.name }}
     --no-password
     --pgdata={{ pgha_data_dir }}
     --xlog-method=stream
