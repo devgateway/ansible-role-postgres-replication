@@ -30,12 +30,8 @@
     mode: 0600
     owner: postgres
     path: "{{ postgres_user.home }}/.pgpass"
-    line: "{{ host }}:5432:{{ pgha_user.database }}:{{ pgha_user.user }}:{{ pgha_user.password }}"
-  loop:
-    - "{{ pgha_master }}"
-    - "{{ pgha_slave }}"
-  loop_control:
-    loop_var: host
+    line: >-
+      {{ pgha_virtual_ip }}:*:{{ pgha_user.database }}:{{ pgha_user.user }}:{{ pgha_user.password }}
 
 - name: Configure master
   import_tasks: master.yml
