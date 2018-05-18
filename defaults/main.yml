@@ -22,7 +22,6 @@ pgha_recovery_settings:
   standby_mode: true
   primary_conninfo: >-
     host={{ pgha_master }}
-    port=5432
     user={{ pgha_user.name }}
     application_name={{ pgha_slave }}-slave
   restore_command: cp {{ pgha_archive_dir }}/%f %p
