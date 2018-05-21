@@ -1,4 +1,4 @@
-{%  macro table_row(acl_type, database, user, addr, method) %}
+{%  macro table_row(acl_type, database, name, addr, method) %}
 {%    filter replace('\n', '') %}
 {{      '{:9s}'.format(acl_type) }}
 {{      '{:16s}'.format(database) }}
@@ -10,5 +10,5 @@
 
 {{  table_row('# Type', 'Database', 'User', 'Address', 'Method') }}
 {%  for acl in (pgha_hba_defaults + [pgha_user]) %}
-{{    table_row(acl.type, acl.database, acl.user, (acl.address | default('')), acl.method) }}
+{{    table_row(acl.type, acl.database, acl.name, (acl.address | default('')), acl.method) }}
 {%  endfor %}
