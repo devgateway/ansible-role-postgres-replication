@@ -46,67 +46,64 @@
 - name: Set up high availability
   include_role:
     name: devgateway.pacemaker
-    vars:
-      pacemaker_password: toor
-      pacemaker_cluster_name: postgres
-      pacemaker_properties:
-        stonith_enabled: "false"
-        no_quorum_policy: ignore
-      pacemaker_resource_defaults:
-        resource_stickiness: INFINITY
-        migration_threshold: 1
-      pacemaker_resources:
-        - id: master-ip
-          type: "ocf:heartbeat:IPaddr2"
-          options:
-            ip: "{{ pgha_virtual_ip }}"
-        - id: postgres
-          type: "ocf:heartbeat:pgsql"
+  vars:
+    pacemaker_password: toor
+    pacemaker_cluster_name: postgres
+    pacemaker_properties:
+      stonith-enabled: "false"
+      no-quorum-policy: ignore
+    pacemaker_resource_defaults:
+      resource_stickiness: INFINITY
+      migration_threshold: 1
+    pacemaker_resources:
+      - id: master-ip
+        type: "ocf:heartbeat:IPaddr2"
+        options:
+          ip: "{{ pgha_virtual_ip }}"
+      - id: postgres
+        type: "ocf:heartbeat:pgsql"
+        master:
+          id: pg-replica-set
           master:
-            id: pg-replica-set
-            resource: postgres
-            master:
-              max: 1
-              node_max: 1
-            clone:
-              max: 2
-              node_max: 1
-            notify: true
+            max: 1
+            node_max: 1
+          clone:
+            max: 2
+            node_max: 1
+          notify: true
+        options:
+          pgctl: "{{ pgha_bin_dir }}/pg_ctl"
+          psql: "{{ pgha_bin_dir }}/psql"
+          pgdata: "{{ pgha_data_dir }}"
+          rep_mode: sync
+          node_list: "{{ pgha_master }} {{ pgha_slave }}"
+          restore_command: "{{ pgha_recovery_settings.restore_command }}"
+          master_ip: "{{ pgha_virtual_ip }}"
+          restart_on_promote: "true"
+        op:
+          - action: start
             options:
-              pgctl: "{{ pgha_bin_dir }}/pg_ctl"
-              psql: "{{ pgha_bin_dir }}/psql"
-              pgdata: "{{ pgha_data_dir }}"
-              rep_mode: sync
-              node_list: "{{ pgha_master }} {{ pgha_slave }}"
-              restore_command: "{{ pgha_recovery_settings.restore_command }}"
-              master_ip: "{{ pgha_virtual_ip }}"
-              restart_on_promote: "true"
-            op:
-              - action: start
-                options:
-                  on_fail: restart
-              - action: monitor
-                options:
-                  interval: 60s
-                  on_fail: restart
-              - action: monitor
-                options:
-                  role: Master
-                  interval: 3s
-                  on_fail: restart
-              - action: promote
-                options:
-                  on_fail: restart
-              - action: demote
-                options:
-                  on_fail: stop
-              - action: stop
-                options:
-                  on_fail: block
-              - action: notify
-      pacemaker_constraints:
-        colocation:
-          - master-ip with Master pg-replica-set INFINITY
-        order:
-          - promote pg-replica-set then start master-ip symmetrical=false score=INFINITY
-          - demote pg-replica-set then stop master-ip symmetrical=false score=0
+              on_fail: restart
+          - action: monitor
+            options:
+              interval: 60s
+              on_fail: restart
+          - action: monitor
+            options:
+              role: Master
+              interval: 3s
+              on_fail: restart
+          - action: promote
+            options:
+              on_fail: restart
+          - action: demote
+            options:
+              on_fail: stop
+          - action: stop
+            options:
+              on_fail: block
+          - action: notify
+    pacemaker_constraints:
+      - colocation add master-ip with Master pg-replica-set INFINITY
+      - order promote pg-replica-set then start master-ip symmetrical=false score=INFINITY
+      - order demote pg-replica-set then stop master-ip symmetrical=false score=0
