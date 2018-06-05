@@ -47,63 +47,103 @@
   include_role:
     name: devgateway.pacemaker
   vars:
-    pacemaker_password: toor
+    pacemaker_pretty_xml: true
+    pacemaker_password: "{{ pgha_cluster_password | mandatory }}"
     pacemaker_cluster_name: postgres
     pacemaker_properties:
-      stonith-enabled: "false"
+      stonith-enabled: false
       no-quorum-policy: ignore
     pacemaker_resource_defaults:
       resource_stickiness: INFINITY
       migration_threshold: 1
-    pacemaker_resources:
-      - id: master-ip
-        type: "ocf:heartbeat:IPaddr2"
+    pacemaker_simple_resources:
+      virtual-ip:
+        resource:
+          class: ocf
+          provider: heartbeat
+          type: IPaddr2
         options:
           ip: "{{ pgha_virtual_ip }}"
-      - id: postgres
-        type: "ocf:heartbeat:pgsql"
-        master:
-          id: pg-replica-set
-          master:
-            max: 1
-            node_max: 1
-          clone:
-            max: 2
-            node_max: 1
-          notify: true
-        options:
-          pgctl: "{{ pgha_bin_dir }}/pg_ctl"
-          psql: "{{ pgha_bin_dir }}/psql"
-          pgdata: "{{ pgha_data_dir }}"
-          rep_mode: sync
-          node_list: "{{ pgha_master }} {{ pgha_slave }}"
-          restore_command: "{{ pgha_recovery_settings.restore_command }}"
-          master_ip: "{{ pgha_virtual_ip }}"
-          restart_on_promote: "true"
+        meta:
+          migration-threshold: 0
         op:
-          - action: start
+          - name: start
+            timeout: 60s
+            interval: 0s
+            on-fail: restart
+          - name: monitor
+            timeout: 60s
+            interval: 10s
+            on-fail: restart
+          - name: stop
+            timeout: 60s
+            interval: 0s
+            on-fail: restart
+    pacemaker_advanced_resources:
+      postgres:
+        type: master
+        meta:
+          master-max: 1
+          master-node-max: 1
+          clone-max: 2
+          clone-node-max: 1
+          notify: true
+        resources:
+          postgres-replica-set:
+            resource:
+              class: ocf
+              provider: heartbeat
+              type: pgsql
             options:
-              on_fail: restart
-          - action: monitor
-            options:
-              interval: 60s
-              on_fail: restart
-          - action: monitor
-            options:
-              role: Master
-              interval: 3s
-              on_fail: restart
-          - action: promote
-            options:
-              on_fail: restart
-          - action: demote
-            options:
-              on_fail: stop
-          - action: stop
-            options:
-              on_fail: block
-          - action: notify
+              pgctl: "{{ pgha_bin_dir }}/pg_ctl"
+              psql: "{{ pgha_bin_dir }}/psql"
+              pgdata: "{{ pgha_data_dir }}"
+              rep_mode: sync
+              node_list: "{{ pgha_master }} {{ pgha_slave }}"
+              restore_command: "{{ pgha_recovery_settings.restore_command }}"
+              master_ip: "{{ pgha_virtual_ip }}"
+              restart_on_promote: "true"
+              repuser: "{{ pgha_user.name }}"
+            op:
+              - action: start
+                options:
+                  on_fail: restart
+              - action: monitor
+                options:
+                  interval: 60s
+                  on_fail: restart
+              - action: monitor
+                options:
+                  role: Master
+                  interval: 3s
+                  on_fail: restart
+              - action: promote
+                options:
+                  on_fail: restart
+              - action: demote
+                options:
+                  on_fail: stop
+              - action: stop
+                options:
+                  on_fail: block
+              - action: notify
     pacemaker_constraints:
-      - colocation add master-ip with Master pg-replica-set INFINITY
-      - order promote pg-replica-set then start master-ip symmetrical=false score=INFINITY
-      - order demote pg-replica-set then stop master-ip symmetrical=false score=0
+      - type: colocation
+        rsc: virtual-ip
+        with-rsc: postgres
+        with-rsc-role: Master
+        score: INFINITY
+      - type: order
+        first: postgres
+        first-action: promote
+        then: virtual-ip
+        then-action: start
+        symmetrical: false
+        score: INFINITY
+      - type: order
+        first: postgres
+        first-action: demote
+        then: virtual-ip
+        then-action: stop
+        symmetrical: false
+        score: 0
