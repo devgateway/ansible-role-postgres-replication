@@ -33,6 +33,22 @@
     line: >-
       {{ pgha_virtual_ip }}:*:{{ pgha_user.database }}:{{ pgha_user.name }}:{{ pgha_user.password }}
 
+- name: Install slave recovery script
+  template:
+    src: pg_slave_init.sh.j2
+    dest: "{{ pgha_slave_script }}"
+    mode: 0755
+
+- name: Configure slave recovery script
+  lineinfile:
+    path: "{{ pgha_slave_config }}"
+    regex: ^{{ item.key }}=
+    line: "{{ item.key }}={{ item.value }}"
+  with_dict:
+    PG_DATA: "{{ pgha_data_dir }}"
+    MASTER: "{{ pgha_virtual_ip }}"
+    REPUSER: "{{ pgha_user.name }}"
+
 - name: Configure master
   import_tasks: master.yml
   delegate_to: "{{ pgha_master }}"

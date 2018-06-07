@@ -1,0 +1,15 @@
+#!/bin/bash -e
+source "{{ pgha_slave_config }}"
+
+if [[ "$1" != "--force" ]]; then
+  read -p "Delete data from $PG_DATA? [yes/NO] "
+  if [[ "${REPLY,,}" != "yes" ]]; then
+    echo "Data left intact." >&2
+    exit
+  fi
+fi
+
+set -x
+
+find "$PG_DATA" -mindepth 1 -delete
+pg_basebackup --host="$MASTER" --username="$REPUSER" --pgdata="$PG_DATA" --xlog-method=stream

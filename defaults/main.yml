@@ -41,3 +41,5 @@ pgha_hba_defaults:
     database: all
     address: ::1/128
     method: trust
+pgha_slave_script: /usr/local/bin/pg_slave_init.sh
+pgha_slave_config: /etc/pg_slave_init.conf
