@@ -50,7 +50,7 @@
     pacemaker_pretty_xml: true
     pacemaker_password: "{{ pgha_cluster_password | mandatory }}"
     pacemaker_cluster_name: postgres
-    pacemaker_properties:
+    pacemaker_cluster_options:
       stonith-enabled: false
       no-quorum-policy: ignore
     pacemaker_resource_defaults:
