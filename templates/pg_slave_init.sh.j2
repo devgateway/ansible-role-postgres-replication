@@ -3,6 +3,11 @@
 : ${MASTER:={{ pgha_virtual_ip }}}
 : ${REPUSER:={{ pgha_user.name }}}
 
+if [[ "$EUID" -eq "0" ]]; then
+  echo "This script should be run as user postgres." >&2
+  exit 1
+fi
+
 if [[ "$1" != "--force" ]]; then
   read -p "Delete data from $PG_DATA? [yes/NO] "
   if [[ "${REPLY,,}" != "yes" ]]; then
