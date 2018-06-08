@@ -16,6 +16,7 @@ if [[ "$1" != "--force" ]]; then
   fi
 fi
 
+cd
 set -x
 
 find "$PG_DATA" -mindepth 1 -delete
