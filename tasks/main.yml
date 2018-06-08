@@ -42,7 +42,8 @@
 - name: Configure slave recovery script
   lineinfile:
     path: "{{ pgha_slave_config }}"
-    regex: ^{{ item.key }}=
+    create: true
+    regexp: ^{{ item.key }}=
     line: "{{ item.key }}={{ item.value }}"
   with_dict:
     PG_DATA: "{{ pgha_data_dir }}"
