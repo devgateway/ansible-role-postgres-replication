@@ -5,3 +5,20 @@
     creates: "{{ pgha_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
+  register: base_backup
+  ignore_errors: true
+
+- name: Start Postgres service
+  service:
+    name: "{{ pgha_service }}"
+    state: started
+  delegate_to: "{{ pgha_master }}"
+  when: base_backup.failed
+
+- name: Create a base backup (retry)
+  shell: "MASTER={{ pgha_master }} {{ pgha_slave_script }} --force"
+  args:
+    creates: "{{ pgha_data_dir }}/postgresql.conf"
+  become: true
+  become_user: postgres
+  when: base_backup.failed
