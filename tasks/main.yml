@@ -20,12 +20,18 @@
   register: postgres_user
   check_mode: true
 
-- name: Configure remote authentication
+- name: Configure Postgres client authentication
   lineinfile:
     create: true
     mode: 0600
     owner: postgres
     path: "{{ postgres_user.home }}/.pgpass"
+    regexp: >-
+      {{ '^' ~ ('%(host)s:*:%(db)s:%(user)s:' | format(
+      host = host,
+      db = pgrs_user.database,
+      user = pgrs_user.name
+      ) | regex_escape) }}
     line: >-
       {{ '%(host)s:*:%(db)s:%(user)s:%(passw)s' | format(
       host = host,
