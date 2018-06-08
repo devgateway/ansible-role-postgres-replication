@@ -1,6 +1,6 @@
 ---
 - name: Create a base backup
-  command: "{{ pgha_slave_script }} --force"
+  shell: "MASTER={{ pgha_master }} {{ pgha_slave_script }} --force"
   args:
     creates: "{{ pgha_data_dir }}/postgresql.conf"
   become: true
