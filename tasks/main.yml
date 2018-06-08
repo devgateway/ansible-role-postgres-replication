@@ -14,7 +14,7 @@
     owner: postgres
     mode: 0770
 
-- name: Read Postgres uses configuration
+- name: Find Postgres home directory
   user:
     name: postgres
   register: postgres_user
