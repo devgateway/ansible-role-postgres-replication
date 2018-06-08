@@ -1,14 +1,14 @@
 ---
-pgha_archive_dir: /var/lib/pgsql/archive
-pgha_data_dir: /var/lib/pgsql/data
-pgha_bin_dir: /usr/bin
-pgha_service: postgresql
-pgha_pg_settings:
+pgrs_archive_dir: /var/lib/pgsql/archive
+pgrs_data_dir: /var/lib/pgsql/data
+pgrs_bin_dir: /usr/bin
+pgrs_service: postgresql
+pgrs_pg_settings:
   listen_addresses: "*"
   wal_level: hot_standby
   synchronous_commit: true
   archive_mode: true
-  archive_command: cp %p {{ pgha_archive_dir }}/%f
+  archive_command: cp %p {{ pgrs_archive_dir }}/%f
   max_wal_senders: 5
   wal_keep_segments: 32
   hot_standby: true
@@ -18,15 +18,15 @@ pgha_pg_settings:
   max_standby_archive_delay: -1
   restart_after_crash: false
   hot_standby_feedback: true
-pgha_recovery_settings:
+pgrs_recovery_settings:
   standby_mode: true
   primary_conninfo: >-
-    host={{ pgha_master }}
-    user={{ pgha_user.name }}
-    application_name={{ pgha_slave }}-slave
-  restore_command: cp {{ pgha_archive_dir }}/%f %p
+    host={{ pgrs_master }}
+    user={{ pgrs_user.name }}
+    application_name={{ pgrs_slave }}-slave
+  restore_command: cp {{ pgrs_archive_dir }}/%f %p
   recovery_target_timeline: latest
-pgha_hba_defaults:
+pgrs_hba_defaults:
   - type: local
     name: all
     database: all
@@ -41,5 +41,5 @@ pgha_hba_defaults:
     database: all
     address: ::1/128
     method: trust
-pgha_slave_script: /usr/local/bin/pg_slave_init.sh
-pgha_slave_config: /etc/pg_slave_init.conf
+pgrs_slave_script: /usr/local/bin/pg_slave_init.sh
+pgrs_slave_config: /etc/pg_slave_init.conf

@@ -1,21 +1,21 @@
 ---
 - name: Initialize the data dir
-  command: "{{ pgha_bin_dir }}/pg_ctl initdb -D {{ pgha_data_dir | quote }}"
+  command: "{{ pgrs_bin_dir }}/pg_ctl initdb -D {{ pgrs_data_dir | quote }}"
   args:
-    creates: "{{ pgha_data_dir }}/postgresql.conf"
+    creates: "{{ pgrs_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
 
 - name: Disable synchronous standby
   ini_file:
-    path: "{{ pgha_data_dir }}/postgresql.conf"
+    path: "{{ pgrs_data_dir }}/postgresql.conf"
     section: null
     option: synchronous_standby_names
     state: absent
 
 - name: Apply replication settings
   ini_file:
-    path: "{{ pgha_data_dir }}/postgresql.conf"
+    path: "{{ pgrs_data_dir }}/postgresql.conf"
     section: null
     option: "{{ item.key }}"
     value: |-
@@ -28,20 +28,20 @@
       {%- else %}
       {{    item.value }}
       {%- endif %}
-  with_dict: "{{ pgha_pg_settings }}"
+  with_dict: "{{ pgrs_pg_settings }}"
   loop_control:
     label: "{{ item.key }}"
 
 - name: Configure Postgres authentication
   template:
     src: pg_hba.conf.j2
-    dest: "{{ pgha_data_dir }}/pg_hba.conf"
+    dest: "{{ pgrs_data_dir }}/pg_hba.conf"
     owner: postgres
 
 - name: Create replication user
   postgresql_user:
-    name: "{{ pgha_user.name }}"
-    password: "{{ pgha_user.password }}"
+    name: "{{ pgrs_user.name }}"
+    password: "{{ pgrs_user.password }}"
     role_attr_flags: REPLICATION,LOGIN
   become: true
   become_user: postgres
@@ -50,14 +50,14 @@
 
 - name: Start Postgres service
   service:
-    name: "{{ pgha_service }}"
+    name: "{{ pgrs_service }}"
     state: started
   when: create_user.failed
 
 - name: Create replication user (retry)
   postgresql_user:
-    name: "{{ pgha_user.name }}"
-    password: "{{ pgha_user.password }}"
+    name: "{{ pgrs_user.name }}"
+    password: "{{ pgrs_user.password }}"
     role_attr_flags: REPLICATION,LOGIN
   become: true
   become_user: postgres

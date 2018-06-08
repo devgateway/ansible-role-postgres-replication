@@ -1,8 +1,8 @@
 ---
 - name: Create a base backup
-  shell: "MASTER={{ pgha_master }} {{ pgha_slave_script }} --force"
+  shell: "MASTER={{ pgrs_master }} {{ pgrs_slave_script }} --force"
   args:
-    creates: "{{ pgha_data_dir }}/postgresql.conf"
+    creates: "{{ pgrs_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
   register: base_backup
@@ -10,15 +10,15 @@
 
 - name: Start Postgres service
   service:
-    name: "{{ pgha_service }}"
+    name: "{{ pgrs_service }}"
     state: started
-  delegate_to: "{{ pgha_master }}"
+  delegate_to: "{{ pgrs_master }}"
   when: base_backup.failed
 
 - name: Create a base backup (retry)
-  shell: "MASTER={{ pgha_master }} {{ pgha_slave_script }} --force"
+  shell: "MASTER={{ pgrs_master }} {{ pgrs_slave_script }} --force"
   args:
-    creates: "{{ pgha_data_dir }}/postgresql.conf"
+    creates: "{{ pgrs_data_dir }}/postgresql.conf"
   become: true
   become_user: postgres
   when: base_backup.failed

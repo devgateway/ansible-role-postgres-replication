@@ -9,6 +9,6 @@
 {%  endmacro -%}
 
 {{  table_row('# Type', 'Database', 'User', 'Address', 'Method') }}
-{%  for acl in (pgha_hba_defaults + [pgha_user]) %}
+{%  for acl in (pgrs_hba_defaults + [pgrs_user]) %}
 {{    table_row(acl.type, acl.database, acl.name, (acl.address | default('')), acl.method) }}
 {%  endfor %}
