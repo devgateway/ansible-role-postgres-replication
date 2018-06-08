@@ -38,11 +38,6 @@
     dest: "{{ pgha_data_dir }}/pg_hba.conf"
     owner: postgres
 
-- name: Start Postgres service
-  service:
-    name: "{{ pgha_service }}"
-    state: started
-
 - name: Create replication user
   postgresql_user:
     name: "{{ pgha_user.name }}"
@@ -50,3 +45,20 @@
     role_attr_flags: REPLICATION,LOGIN
   become: true
   become_user: postgres
+  register: create_user
+  ignore_errors: true
+
+- name: Start Postgres service
+  service:
+    name: "{{ pgha_service }}"
+    state: started
+  when: create_user.failed
+
+- name: Create replication user (retry)
+  postgresql_user:
+    name: "{{ pgha_user.name }}"
+    password: "{{ pgha_user.password }}"
+    role_attr_flags: REPLICATION,LOGIN
+  become: true
+  become_user: postgres
+  when: create_user.failed
