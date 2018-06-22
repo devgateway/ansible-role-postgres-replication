@@ -1,6 +1,6 @@
 #!/bin/bash -e
 : ${PG_DATA:={{ pgrs_data_dir }}}
-: ${MASTER:={{ pgrs_virtual_ip }}}
+: ${MASTER:={{ pgrs_replica_set_master }}}
 : ${REPUSER:={{ pgrs_user.name }}}
 
 if [[ "$EUID" -eq "0" ]]; then

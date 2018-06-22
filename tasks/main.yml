@@ -35,10 +35,7 @@
       user = pgrs_user.name,
       passw = pgrs_user.password
       ) }}
-  loop:
-    - "{{ pgrs_virtual_ip }}"
-    - "{{ pgrs_master }}"
-    - "{{ pgrs_slave }}"
+  loop: "{{ pgrs_pgpass_hosts }}"
   loop_control:
     loop_var: host
 

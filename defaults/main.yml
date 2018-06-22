@@ -43,3 +43,7 @@ pgrs_hba_defaults:
     method: trust
 pgrs_slave_script: /usr/local/bin/pg_slave_init.sh
 pgrs_slave_config: /etc/pg_slave_init.conf
+pgrs_pgpass_hosts:
+  - "{{ pgrs_slave }}"
+  - "{{ pgrs_master }}"
+pgrs_replica_set_master: "{{ pgrs_master }}"
