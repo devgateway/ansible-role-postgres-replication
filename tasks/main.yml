@@ -1,8 +1,4 @@
 ---
-- name: Install Postgres
-  include_role:
-    name: devgateway.vendor-postgres
-
 - name: Install Postgres management library for Python
   package:
     name: python-psycopg2
