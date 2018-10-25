@@ -19,6 +19,5 @@ fi
 cd
 set -x
 
-mkdir -p "$PG_DATA"
 find "$PG_DATA" -mindepth 1 -delete
 pg_basebackup --host="$MASTER" --username="$REPUSER" --pgdata="$PG_DATA" --xlog-method=stream
